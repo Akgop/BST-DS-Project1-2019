@@ -6,92 +6,102 @@ TransferWindowManager::SoccerTeam::SoccerTeam()
 	//You don't need to edit this function.
 }
 
+//Constructor
 TransferWindowManager::SoccerTeam::SoccerTeam(SoccerPlayerData fw, SoccerPlayerData mf, SoccerPlayerData df, SoccerPlayerData gk)
 {
+	//copy parameter to it's member
 	this->fw = fw;
 	this->mf = mf;
 	this->df = df;
 	this->gk = gk;
 
+	//get sum transfer fee and sum ability
 	this->sum_transfer_fee = fw.m_transfer_fee + mf.m_transfer_fee + df.m_transfer_fee + gk.m_transfer_fee;
 	this->sum_ability = fw.m_ability + mf.m_ability + df.m_ability + gk.m_ability;
 }
 
+//Operator Overloaded Function to print best team member
 std::ostream& operator<<(ostream& os, const TransferWindowManager::SoccerTeam& team)
 {
+	//print four best member of each roll
 	os << team.fw << std::endl;
 	os << team.mf << std::endl;
 	os << team.df << std::endl;
 	os << team.gk << std::endl;
 
+	//print its fee and ability
 	os << "sum_transfer_fee " << team.sum_transfer_fee << std::endl;
 	os << "sum_ability " << team.sum_ability << std::endl;
 
 	return os;
 }
 
-
+//Read Textfile and make BST
 TransferWindowManager::TransferWindowManager(string file_dir, int budget)
 {
-	this->m_budget = budget;
+	this->m_budget = budget;	//get budget
 
-	ifstream in(file_dir);
+	ifstream in(file_dir);	//input file stream in. read file
 	string line;
 
-	while (getline(in, line))
+	while (getline(in, line))	//read file line by line.
 	{
-	//Fill in the code to initialize 4 Binary Search Trees(fw, mf, df, gk)
 		string player_name;
 		string position;
 		int fee;
 		int ability;
 
 		char line_char[100];
-		char * context = NULL;
-		strcpy(line_char, line.c_str());
-		char * temp = strtok(line_char, ",");
+		strcpy(line_char, line.c_str());	//convert string to char
+		char * temp = strtok(line_char, ",");	//tokenize with ,
 
-		player_name = temp;
+		player_name = temp;	//player_name
 
-		temp = strtok(NULL, ", ");
-		position = temp;
+		temp = strtok(NULL, ", ");	//tokenize with , and white space
+		position = temp;	//position
 
-		temp = strtok(NULL, ", ");
-		fee = atoi(temp);
+		temp = strtok(NULL, ", ");	//tokenize with , and white space
+		fee = atoi(temp);	//fee
 
-		temp = strtok(NULL, ", ");
-		ability = atoi(temp);
+		temp = strtok(NULL, ", ");	//tokenize with , and white space
+		ability = atoi(temp);	//ability
 	
+		//make Soccer player data object
 		SoccerPlayerData* spd = new SoccerPlayerData(player_name, position, fee, ability);
-		if (position == "Forward") {
-			fwBST.insert(*spd);
+		if (position == "Forward") {	//if position is Forward
+			fwBST.insert(*spd);	//insert data into fwBST
 		}
-		else if (position == "Midfielder") {
-			mfBST.insert(*spd);
+		else if (position == "Midfielder") {	//if position is Midfielder
+			mfBST.insert(*spd);	//insert data into mfBST
 		}
-		else if (position == "Defender") {
-			dfBST.insert(*spd);
+		else if (position == "Defender") {	//if position is Defender
+			dfBST.insert(*spd);	//insert data indo dfBST
 		}
-		else {
-			gkBST.insert(*spd);
+		else {	//else
+			gkBST.insert(*spd);	//insert data into gkBST
 		}
 	}
 }
 
+//Operator Overload, print Trees.
 ostream& operator<<(ostream& os, const TransferWindowManager& manager)
 {
+	//forward tree print
 	os << "********Forward List********" << std::endl;
 	os << manager.fwBST;
 	os << "****************************" << std::endl;
 
+	//midfielder tree print
 	os << "********Midflder List********" << std::endl;
 	os << manager.mfBST;
 	os << "*****************************" << std::endl;
 
+	//defenter tree print
 	os << "********Defender List********" << std::endl;
 	os << manager.dfBST;
 	os << "*****************************" << std::endl;
 
+	//goal keeper tree print
 	os << "********Goalkeeper List********" << std::endl;
 	os << manager.gkBST;
 	os << "*******************************" << std::endl;
@@ -99,9 +109,10 @@ ostream& operator<<(ostream& os, const TransferWindowManager& manager)
 	return os;
 }
 
+//get BestTeam Function
 TransferWindowManager::SoccerTeam TransferWindowManager::getBestTeam()
 {
-	SoccerTeam best_team;
+	SoccerTeam best_team;	//assign struct
 	
 	//Fill in the code to search the best_team from 4 BSTs
 	//The datas for best team must be stored in the variable best_team.
@@ -109,8 +120,10 @@ TransferWindowManager::SoccerTeam TransferWindowManager::getBestTeam()
 	
 	TreeNode *pfwCur, *pmfCur, *pdfCur, *pgkCur;
 	TreeNode *pfwNext, *pmfNext, *pdfNext;
+	//when no more best offer for tree set flag false
 	bool flag_fw = true, flag_mf = true, flag_df = true;
 
+	//initialize with root of each tree
 	if (fwBST.m_root != NULL) {
 		pfwCur = fwBST.m_root;
 	}
@@ -125,27 +138,29 @@ TransferWindowManager::SoccerTeam TransferWindowManager::getBestTeam()
 	}
 
 	//
-	// Inorder 역순으로 오른쪽부터 가면됨.
+	// # Move Inorder Reversely
 	//
-	stack<TreeNode*> sfw;
-	stack<TreeNode*> smf;
-	stack<TreeNode*> sdf;
+	stack<TreeNode*> sfw;	//stack for fwBST
+	stack<TreeNode*> smf;	//stack for mfBST
+	stack<TreeNode*> sdf;	//stack for dfBST
 
-	stack<TreeNode*> temp_sfw;
-	stack<TreeNode*> temp_smf;
-	stack<TreeNode*> temp_sdf;
-	// 1. 가장 능력치가 좋은 3 선수부터 시작.
-	while (1) {
-		if (pfwCur != NULL) {
-			sfw.push(pfwCur);
-			pfwCur = pfwCur->m_right;
+	stack<TreeNode*> temp_sfw;	//temparory sfw
+	stack<TreeNode*> temp_smf;	//temparory smf
+	stack<TreeNode*> temp_sdf;	//temparory sdf
+	//
+	// 1. Start with Best Ability Players
+	//
+	while (1) {	//move to right node in the tree while there's no more right child
+		if (pfwCur != NULL) {	//if node is not NULL
+			sfw.push(pfwCur);	//push into stack
+			pfwCur = pfwCur->m_right;	//move to right node 
 		}
-		else {
-			break;
+		else {	//when node is null
+			break;	//stop
 		}
 	}
-	while (1) {
-		if (pmfCur != NULL) {
+	while (1) { //move to right node in the tree while there's no more right child
+		if (pmfCur != NULL) {	//same with fw
 			smf.push(pmfCur);
 			pmfCur = pmfCur->m_right;
 		}
@@ -153,8 +168,8 @@ TransferWindowManager::SoccerTeam TransferWindowManager::getBestTeam()
 			break;
 		}
 	}
-	while (1) {
-		if (pdfCur != NULL) {
+	while (1) { //move to right node in the tree while there's no more right child
+		if (pdfCur != NULL) {	//same with fw
 			sdf.push(pdfCur);
 			pdfCur = pdfCur->m_right;
 		}
@@ -163,145 +178,164 @@ TransferWindowManager::SoccerTeam TransferWindowManager::getBestTeam()
 		}
 	}
 
+	//current pointer = top node of stack. and pop it.
 	pfwCur = sfw.top();		sfw.pop();
 	pmfCur = smf.top();		smf.pop();
 	pdfCur = sdf.top();		sdf.pop();
 
-	// 2. 예산 비교
+	//
+	// 2. Comparing Budget
+	//
 	while (1) {
-		//SoccerTeam * team = new SoccerTeam(pfwCur->m_data, pmfCur->m_data, pdfCur->m_data, pgkCur->m_data);
+		//set best_team
 		best_team = { pfwCur->m_data, pmfCur->m_data, pdfCur->m_data, pgkCur->m_data };
 
-		//스택 깊은 복사 해야됨.
+		// deep copy of stack.
 		temp_sfw = sfw;
 		temp_smf = smf;
 		temp_sdf = sdf;
 
-		if (best_team.sum_transfer_fee <= this->m_budget) {	//가격이 적합하면.
-			break;
+		if (best_team.sum_transfer_fee <= this->m_budget) {	//if budget not over
+			break;	//stop;
 		}
-		else {	// 3. 다음으로 능력치 좋은 팀 선정
-			// 3-1. fw 다음 노드 선정
+		//
+		// 3. Set Next best_team 
+		//
+		else {	
+			// 3-1. set next fw node
 			pfwNext = pfwCur;
 			while (1) {
-				if (pfwNext->m_left != NULL) {	//fw 왼쪽 child 가 있으면
-					pfwNext = pfwNext->m_left;	//왼쪽으로 이동
+				if (pfwNext->m_left != NULL) {	//if fw has left child
+					pfwNext = pfwNext->m_left;	//move left
 					while (1) {
-						if (pfwNext->m_right != NULL) {	//fw 오른쪽 child 있으면
-							sfw.push(pfwNext);	//스택에 넣고
-							pfwNext = pfwNext->m_right;	//오른쪽으로 이동
+						if (pfwNext->m_right != NULL) {	//if fw has right child
+							sfw.push(pfwNext);	//stack push
+							pfwNext = pfwNext->m_right;	//move right
 						}
-						else {	//fw 오른쪽 child 없으면
-							break;
+						else {	//if no more right child
+							break; //stop
 						}
 					}
-					if (pfwNext->m_data.m_transfer_fee < pfwCur->m_data.m_transfer_fee) {	//하위 노드가 더 싸면
-						break;	// pNext 고정
+					//if pfwNext node is cheaper
+					if (pfwNext->m_data.m_transfer_fee < pfwCur->m_data.m_transfer_fee) {	
+						break;	// fix pfwNext and break.
 					}
-					else { continue; }	//아니면 다시 맨 위로 올라감
+					else { continue; }	//else, loop again
 				}
-				else {	//없으면
-					if (sfw.empty()) {
-						pfwNext = pfwCur;	//기존 친구로 복귀.
-						flag_fw = false;	//끝났다는 표시.
-						break;
+				else {	//no left child
+					if (sfw.empty()) {	//if stack is empty
+						pfwNext = pfwCur;	//came back to original one.
+						flag_fw = false;	//set flag false. it means cannot find any better one.
+						break;	//break;
 					}
-					pfwNext = sfw.top();
+					pfwNext = sfw.top(); //else stack pop.
 					sfw.pop();
-					if (pfwNext->m_data.m_transfer_fee < pfwCur->m_data.m_transfer_fee) {	//하위 노드가 더 싸면
-						break;	// pNext 고정
+					//if pfwNext node is cheaper
+					if (pfwNext->m_data.m_transfer_fee < pfwCur->m_data.m_transfer_fee) {
+						break;	// fix pfwNext and break.
 					}
-					else { continue; }	//아니면 다시 올라감
+					else { continue; }	//else, loop again
 				}
 			}
-			// 3-2. mf 다음 노드 선정
+			// 3-2. set next mf node (it works same with fw node)
 			pmfNext = pmfCur;
 			while (1) {
-				if (pmfNext->m_left != NULL) {	//fw 왼쪽 child 가 있으면
-					pmfNext = pmfNext->m_left;	//왼쪽으로 이동
+				if (pmfNext->m_left != NULL) {	//if mf has left child
+					pmfNext = pmfNext->m_left;	//move left
 					while (1) {
-						if (pmfNext->m_right != NULL) {	//fw 오른쪽 child 있으면
-							smf.push(pmfNext);	//스택에 넣고
-							pmfNext = pmfNext->m_right;	//오른쪽으로 이동
+						if (pmfNext->m_right != NULL) {	//if mf has left child
+							smf.push(pmfNext);	//stack push
+							pmfNext = pmfNext->m_right;	//move right
 						}
-						else {	//fw 오른쪽 child 없으면
+						else {	//if no more right child
 							break;
 						}
 					}
-					if (pmfNext->m_data.m_transfer_fee < pmfCur->m_data.m_transfer_fee) {	//하위 노드가 더 싸면
-						break;	// pNext 고정
+					//if pmfNext node is cheaper
+					if (pmfNext->m_data.m_transfer_fee < pmfCur->m_data.m_transfer_fee) {	
+						break;	// fix pmfNext and break.
 					}
-					else { continue; }	//아니면 다시 맨 위로 올라감
+					else { continue; }	//else, loop again
 				}
-				else {	//없으면'
-					if (smf.empty()) {
-						pmfNext = pmfCur;	//기존 친구로 복귀.
-						flag_mf = false;	//끝났다는 표시.
+				else {	//no left child
+					if (smf.empty()) {	//if stack is empty
+						pmfNext = pmfCur;	//came back to original one.
+						flag_mf = false;	//set flag false. it means cannot find any better one.
 						break;
 					}
-					pmfNext = smf.top();
+					pmfNext = smf.top();	//else stack pop.
 					smf.pop();
-					if (pmfNext->m_data.m_transfer_fee < pmfCur->m_data.m_transfer_fee) {	//하위 노드가 더 싸면
-						break;	// pNext 고정
+					//if pfwNext node is cheaper
+					if (pmfNext->m_data.m_transfer_fee < pmfCur->m_data.m_transfer_fee) {
+						break;	// fix pmfNext and break.
 					}
-					else { continue; }	//아니면 다시 올라감
+					else { continue; }	//else, loop again
 				}
 			}
-			// 3-3. df 다음 노드 선정
+			// 3-3. set next df node (it works same with fw node)
 			pdfNext = pdfCur;
 			while (1) {
-				if (pdfNext->m_left != NULL) {	//fw 왼쪽 child 가 있으면
-					pdfNext = pdfNext->m_left;	//왼쪽으로 이동
+				if (pdfNext->m_left != NULL) {	//if df has left child
+					pdfNext = pdfNext->m_left;	//move left
 					while (1) {
-						if (pdfNext->m_right != NULL) {	//fw 오른쪽 child 있으면
-							sdf.push(pdfNext);	//스택에 넣고
-							pdfNext = pdfNext->m_right;	//오른쪽으로 이동
+						if (pdfNext->m_right != NULL) {	//if df has left child
+							sdf.push(pdfNext);	//stack push
+							pdfNext = pdfNext->m_right;	//move right
 						}
-						else {	//fw 오른쪽 child 없으면
+						else {	//if no more right child
 							break;
 						}
 					}
-					if (pdfNext->m_data.m_transfer_fee < pdfCur->m_data.m_transfer_fee) {	//하위 노드가 더 싸면
-						break;	// pNext 고정
+					//if pdfNext node is cheaper
+					if (pdfNext->m_data.m_transfer_fee < pdfCur->m_data.m_transfer_fee) {	
+						break;	// fix pdfNext and break.
 					}
-					else { continue; }	//아니면 다시 맨 위로 올라감
+					else { continue; }	//else, loop again
 				}
-				else {	//없으면
-					//정말로 마지막 (가장 안좋은 놈일때)
-					if (sdf.empty()) {
-						pdfNext = pdfCur;	//기존 친구로 복귀.
-						flag_df = false;	//끝났다는 표시.
+				else {	//no left child
+					if (sdf.empty()) {		//if stack is empty
+						pdfNext = pdfCur;	//came back to original one.
+						flag_df = false;	//set flag false. it means cannot find any better one.
 						break;
 					}
-					pdfNext = sdf.top();
+					pdfNext = sdf.top();	//else stack pop.
 					sdf.pop();
-					if (pdfNext->m_data.m_transfer_fee < pdfCur->m_data.m_transfer_fee) {	//하위 노드가 더 싸면
-						break;	// pNext 고정
+					//if pdfNext node is cheaper
+					if (pdfNext->m_data.m_transfer_fee < pdfCur->m_data.m_transfer_fee) {	
+						break;	// fix pdfNext and break.
 					}
-					else { continue; }	//아니면 다시 올라감
+					else { continue; }	//else, loop again
 				}
 			}
 
-			//SoccerTeam * fw_team = new SoccerTeam(pfwNext->m_data, pmfCur->m_data, pdfCur->m_data, pgkCur->m_data);
+			//
+			// 4. Compare Ability and fee
+			//
 			SoccerTeam fw_team, mf_team, df_team;
+			// 4-1. moved only forward data
 			fw_team = { pfwNext->m_data, pmfCur->m_data, pdfCur->m_data, pgkCur->m_data };
+			// 4-2. moved only midfielder data
 			mf_team = { pfwCur->m_data, pmfNext->m_data, pdfCur->m_data, pgkCur->m_data };
+			// 4-3. moved only defender data
 			df_team = { pfwCur->m_data, pmfCur->m_data, pdfNext->m_data, pgkCur->m_data };
 			
-			// 4. 능력치 및 가격 비교 함수.
-			if (getTeamSquad(fw_team, mf_team, df_team, flag_fw, flag_mf, flag_df) == 1) {
-				pfwCur = pfwNext;	smf = temp_smf;		sdf = temp_sdf;
+			// Call functions to compare squad
+			// if pfwNext makes new best team
+			if (getTeamSquad(fw_team, mf_team, df_team, flag_fw, flag_mf, flag_df) == 1) {	//pfwCur = pfwNext
+				pfwCur = pfwNext;	smf = temp_smf;		sdf = temp_sdf;	//mf, df, return stack to original
 			}
+			// if pmfNext makes new best team
 			else if (getTeamSquad(fw_team, mf_team, df_team, flag_fw, flag_mf, flag_df) == 2) {
-				pmfCur = pmfNext;	sfw = temp_sfw;		sdf = temp_sdf;
+				pmfCur = pmfNext;	sfw = temp_sfw;		sdf = temp_sdf;	//fw, df return stack to original
 			}
+			// if pdfNext makes new best team
 			else if (getTeamSquad(fw_team, mf_team, df_team, flag_fw, flag_mf, flag_df) == 3) {
-				pdfCur = pdfNext;	sfw = temp_sfw;		smf = temp_smf;
+				pdfCur = pdfNext;	sfw = temp_sfw;		smf = temp_smf;	//fw, mf return stack to original
 			}
 		}
 	}
 
-
+	// Call function to delete best team.
 	fwBST.deletion(best_team.fw.m_ability);
 	mfBST.deletion(best_team.mf.m_ability);
 	dfBST.deletion(best_team.df.m_ability);
@@ -315,12 +349,11 @@ int TransferWindowManager::getTeamSquad(SoccerTeam fw, SoccerTeam mf, SoccerTeam
 	// return 1 -> fw
 	// return 2 -> mf
 	// return 3 -> df
-	// 만약 끝까지 다 같다면 fw , mf순으로 리턴.
-	// 그 다음에도 결판이 안난다면 그다음 mf 나 df가 빼지게 되어있음.
+	// if everything is same then, priority is fw > mf > df
 
-	//아직 한계치에 도달하지 못한경우
+	//if all flags are true
 	if (fw_flag && mf_flag && df_flag) {
-		// 4-1. 3개가 능력치가 다 같은경우
+		// if three player has same ability
 		if (fw.sum_ability == mf.sum_ability && mf.sum_ability == df.sum_ability) { // 1) fw = mf = df
 			if (df.sum_transfer_fee < mf.sum_transfer_fee && df.sum_transfer_fee < fw.sum_transfer_fee) {	// 1-1) df < mf, fw
 				return 3;
@@ -332,7 +365,7 @@ int TransferWindowManager::getTeamSquad(SoccerTeam fw, SoccerTeam mf, SoccerTeam
 				else { return 1; }	// 1-3) fw <= mf
 			}
 		}
-		// 4-2. 2개의 능력치가 최대인 경우.
+		// if two player has same ability and larger then other one
 		else if (fw.sum_ability == mf.sum_ability && mf.sum_ability > df.sum_ability) { // 2) fw = mf > df
 			if (fw.sum_transfer_fee <= mf.sum_transfer_fee) {	// 2-1) fw <= mf 
 				return 1;
@@ -351,7 +384,7 @@ int TransferWindowManager::getTeamSquad(SoccerTeam fw, SoccerTeam mf, SoccerTeam
 			}
 			else { return 3; }	// 2-2) df < mf
 		}
-		// 4-3. 1개가 높은 경우.
+		// if one player has biggest ability
 		else if (fw.sum_ability > mf.sum_ability && fw.sum_ability > df.sum_ability) {	// 5) fw > mf, df
 			return 1;
 		}
@@ -362,58 +395,59 @@ int TransferWindowManager::getTeamSquad(SoccerTeam fw, SoccerTeam mf, SoccerTeam
 			return 3;
 		}
 	}
-	//df 가 이미 한계인 경우
+	//if df flag is false
 	else if (fw_flag && mf_flag && !df_flag) {
 		if (fw.sum_ability == mf.sum_ability) {	// fw = mf
-			if (mf.sum_transfer_fee < fw.sum_transfer_fee) {	//mf < fw (가격)
+			if (mf.sum_transfer_fee < fw.sum_transfer_fee) {	//mf < fw (fee)
 				return 2;
 			}
-			else { return 1; }	// fw <= mf (가격)
+			else { return 1; }	// fw <= mf (fee)
 		}
 		else if (fw.sum_ability > mf.sum_ability) {	// fw > mf
 			return 1;
 		}
 		else { return 2; }	// mf > fw
 	}
-	//mf 가 이미 한계인 경우
+	//if mf flag is false
 	else if (fw_flag && !mf_flag && df_flag) {	
 		if (fw.sum_ability == df.sum_ability) {	// fw = df
-			if (df.sum_transfer_fee < fw.sum_transfer_fee) {	//df < fw (가격)
+			if (df.sum_transfer_fee < fw.sum_transfer_fee) {	//df < fw (fee)
 				return 3;
 			}
-			else { return 1; }	// fw <= df (가격)
+			else { return 1; }	// fw <= df (fee)
 		}
 		else if (fw.sum_ability > df.sum_ability) {	// fw > df
 			return 1;
 		}
 		else { return 3; }	// df > fw
 	}
-	//fw 가 이미 한계인 경우
+	//if fw flag is false
 	else if (!fw_flag && mf_flag && df_flag) {
 		if (mf.sum_ability == df.sum_ability) {	// mf = df
-			if (df.sum_transfer_fee < mf.sum_transfer_fee) {	//df < mf (가격)
+			if (df.sum_transfer_fee < mf.sum_transfer_fee) {	//df < mf (fee)
 				return 3;
 			}
-			else { return 2; }	// mf <= df (가격)
+			else { return 2; }	// mf <= df (fee)
 		}
 		else if (mf.sum_ability > df.sum_ability) {	// mf > df
 			return 2;
 		}
 		else { return 3; }	// df > mf
 	}
-	//mf, df가 한계인 경우
+	//if fw only true
 	else if (fw_flag && !mf_flag && !df_flag) {
 		return 1;
 	}
-	//fw, df가 한계인 경우
+	// if mf only true
 	else if (!fw_flag && mf_flag && !df_flag) {
 		return 2;
 	}
-	//fw, mf가 한계인 경우
+	//if df only true
 	else if (!fw_flag && !mf_flag && df_flag) {
 		return 3;
 	}
-	else {	//셋다 한계인 경우 에러.
+	//if all three false, send error
+	else {
 		return -1;
 	}
 }

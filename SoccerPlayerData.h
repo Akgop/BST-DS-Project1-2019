@@ -18,7 +18,7 @@ private:
 
 public:
 	SoccerPlayerData() { }
-	SoccerPlayerData(string name, string position, int transfer_fee, int ability)
+	SoccerPlayerData(string name, string position, int transfer_fee, int ability)	//class struct
 		:
 		m_name(name),
 		m_position(position),
@@ -27,6 +27,7 @@ public:
 	{
 	}
 
+	//operator overloading to print SoccerPlayereData
 	friend ostream& operator<<(ostream& os, const SoccerPlayerData& node) {
 		os << "(node.m_name: " << node.m_name << "), "
 			<< "(node.m_position: " << node.m_position << "), "

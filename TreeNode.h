@@ -24,6 +24,7 @@ public:
 	TreeNode* getLeftNode() const { return m_left; }
 	TreeNode* getRightNode() const { return m_right; }
 
+	//operator overloading
 	friend ostream& operator<<(ostream& os, const TreeNode* node)
 	{
 		if (node != NULL) {

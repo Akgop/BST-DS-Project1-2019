@@ -1,178 +1,189 @@
 #include "BinarySearchTree.h"
 using namespace std;
 
-//소멸자.
+//Destructor
 BinarySearchTree::~BinarySearchTree()
 {
-	//while (1) {
-	//	if (this->m_root == NULL) {
-	//		break;
-	//	}
-	//	else {
-	//		deletion(this->m_root->m_data.m_ability);
-	//	}
-	//}
+	if (this->m_root != NULL) {	//if tree is not empty
+		postOrder(this->m_root);	//De-allocate every tree node
+		this->m_root = NULL;	//then make root null
+	}
 }
 
+//BST Insert Function
 void BinarySearchTree::insert(SoccerPlayerData & data)
 {
-	TreeNode * pNew = new TreeNode(data);
-	TreeNode * pCur;
+	TreeNode * pNew = new TreeNode(data);	//allocate new TreeNode
+	TreeNode * pCur;	//set current node pointer
 	if (this->m_root == NULL) {	//if root is empty
 		this->m_root = pNew;	//set new node as root
 		return;
 	}
-	else {
+	else {	//tree not empty
 		pCur = this->m_root; //initialize with root
 		while (1) {
 			if (data.m_ability < pCur->m_data.m_ability) {	//if ability is smaller
-				//if no left child
-				if (pCur->m_left == NULL) {
+				if (pCur->m_left == NULL) {	//if no left child
 					pCur->m_left = pNew;	//set left as new node
-					return;
+					return;	//stop
 				}
 				else {	//if left child exists
 					pCur = pCur->m_left;	//goto leftchild
 				}
 			}
-			else if (data.m_ability > pCur->m_data.m_ability) {	//if ability is larger
-				//if no right child
-				if (pCur->m_right == NULL) {
+			else if (data.m_ability > pCur->m_data.m_ability) {	//if ability is bigger
+				if (pCur->m_right == NULL) {	//if no right child
 					pCur->m_right = pNew;	//set right as new node
-					return;
+					return;	//stop
 				}
 				else {	//if right child exists
-					pCur = pCur->m_right;
+					pCur = pCur->m_right;	//goto rightchild
 				}
 			}
 			else {
-				cout << "Error(NO SAME ABILITY DATA)" << endl;
+				cout << "Error(NO SAME ABILITY DATA)" << endl;	//error handling
 			}
 		}
 	}
 }
 
+//Delete Best Team Memeber Function
 void BinarySearchTree::deletion(int ability)
 {
-	if (this->m_root == NULL) {
-		return;
+	if (this->m_root == NULL) {	//if tree is empty
+		return;	//return
 	}
-	else {
-		TreeNode * target_parent = this->m_root;
-		TreeNode * delete_target = this->m_root;
-		TreeNode * change_target = this->m_root;
-		TreeNode * change_target_parent = this->m_root;
-		if (delete_target->m_data.m_ability == ability) {	//찾고자 하는 값이 루트인경우
-			if (delete_target->m_left == NULL) {	//왼쪽 child노드 없을때.
-				if (delete_target->m_right == NULL) {	//오른쪽 child노드도 없을때
-					this->m_root = NULL; 
-					delete delete_target;	//그냥 루트 삭제.
+	else {	//tree is not empty
+		TreeNode * target_parent = this->m_root;	//delete target's parent node pointer
+		TreeNode * delete_target = this->m_root;	//delete target node pointer
+		TreeNode * change_target = this->m_root;	//change spot node pointer
+		TreeNode * change_target_parent = this->m_root;	//change spot parent node
+		if (delete_target->m_data.m_ability == ability) {	//if target is root
+			if (delete_target->m_left == NULL) {	//if no left child
+				if (delete_target->m_right == NULL) {	//if no right child
+					this->m_root = NULL;	//root <- null
+					delete delete_target;	//delete target
 				}
-				else {	//오른쪽 노드는 있을때
-					this->m_root = delete_target->m_right;	//루트노드를 지울대상의 오른쪽 노드로 지정
-					delete target_parent;	//현재 노드 지워버림.
+				else {	//no left child, exists right child
+					this->m_root = delete_target->m_right;	//set right child as root
+					delete target_parent;	//delete target
 				}
 			}
-			else {	//왼쪽 child 노드 있을때.
-				change_target_parent = change_target;
-				change_target = delete_target->m_left;
-				if (change_target->m_right == NULL) {	//오른쪽 노드가 없으면
-					change_target->m_right = delete_target->m_right;
-					this->m_root = change_target;
-					delete delete_target;
+			else {	//if left child exists
+				change_target_parent = change_target;	//change spot parent node <- change spot node
+				change_target = delete_target->m_left;	//change spot move left
+				if (change_target->m_right == NULL) {	//if no right node
+					change_target->m_right = delete_target->m_right;	//change spot's right child <- target's right child
+					this->m_root = change_target;	//set root as change spot node
+					delete delete_target;	//delete target
 				}
-				else {	//오른쪽 노드가 있으면
+				else {	//if right child exists
 					while (1) {
-						change_target_parent = change_target;	//부모노드 = 현재노드
-						change_target = change_target->m_right; //오른쪽으로 한칸 이동.
-						if (change_target->m_right == NULL) {	//옮긴 다음 오른쪽이 더이상 없다면 
-							break;	//멈춤.
+						change_target_parent = change_target;	//target parent = current node
+						change_target = change_target->m_right; //goto right child (change target)
+						if (change_target->m_right == NULL) {	//if no more right child
+							break;
 						}
 					}
-					if (change_target->m_left != NULL) {	//바꿀 놈의 왼쪽이 있었다면
-						change_target_parent->m_right = change_target->m_left;	//그 부모의 왼쪽으로 설정
+					if (change_target->m_left != NULL) {	//if left child exist
+						change_target_parent->m_right = change_target->m_left;	//set change spot parent's right child as change target's left child
 					}
-					else {
-						change_target_parent->m_right = NULL;	//없었다면 그냥 NULL 값.
+					else { //if no left child
+						change_target_parent->m_right = NULL;	//no child, so set null at right child
 					}
-					change_target->m_left = delete_target->m_left;
+					change_target->m_left = delete_target->m_left;	//change node
 					change_target->m_right = delete_target->m_right;
-					this->m_root = change_target;
-					delete delete_target;
+					this->m_root = change_target;	//set root as changed node
+					delete delete_target;	//delete target
 				}
 			}
 		}
-		else {	//루트는 아닌경우
-			// 1. 타겟과 타겟의 부모노드를 찾아줌.
+		else {	//if target is not root node
+			// 1. find delete target and delete target's parent
 			while (1) {
-				if (delete_target->m_data.m_ability < ability) {	//현재 노드값이 지우려는 값보다 작으면.
+				if (delete_target->m_data.m_ability < ability) {	//if current node ability < target ability
 					target_parent = delete_target;
-					delete_target = delete_target->m_right;	//오른쪽으로 이동.
+					delete_target = delete_target->m_right;	//goto right child
 				}
-				else if (delete_target->m_data.m_ability > ability) {
+				else if (delete_target->m_data.m_ability > ability) {	//cur node ability > target ability
 					target_parent = delete_target;
-					delete_target = delete_target->m_left;	//왼쪽으로 이동.
+					delete_target = delete_target->m_left;	//goto left child
 				}
-				else {
-					break;
+				else {	//if ability is same
+					break;	//break
 				}
 			}
-			// 2. 바꾸려고 하는 노드와 그 부모노드를 찾아줌.
+			// 2. find the change target and it's parent node & 3. delete node
 			change_target = delete_target;	change_target_parent = delete_target;
-			if (change_target->m_left == NULL) {	//바꾸려는 값의 왼쪽이 null이라면.
-				if (change_target->m_right == NULL) {	//오른쪽도 null 이라면 (즉 자식이 없으면)
+			if (change_target->m_left == NULL) {	//if change target's left child is null
+				if (change_target->m_right == NULL) {	//same at right child
+					//if right child
 					if (change_target->m_data.m_ability > target_parent->m_data.m_ability) {
-						target_parent->m_right = NULL;
+						target_parent->m_right = NULL;	//set parent's right child as null
 					}
-					else {
-						target_parent->m_left = NULL;
+					else {	//if left child
+						target_parent->m_left = NULL;	//set parent's left child as null
 					}
-					delete delete_target;
+					delete delete_target;	//delete target
 				}
-				else {	//오른쪽은 있다면.
-					change_target = change_target->m_right;
+				else {	//if right child exist
+					change_target = change_target->m_right;	//goto right child
+					//if change target ability > delete target parent's ability
 					if (change_target->m_data.m_ability > target_parent->m_data.m_ability) {
-						target_parent->m_right = change_target;
+						target_parent->m_right = change_target;	//set change target as right child of target parents 
 					}
 					else {
-						target_parent->m_left = change_target;
+						target_parent->m_left = change_target;	//set change target as left child of target parents
 					}
-					delete delete_target;
+					delete delete_target;	//delete node
 				}
 			}
-			else {	//왼쪽이 있다면.
+			else {	//if left child exists
 				change_target_parent = change_target;
-				change_target = change_target->m_left;	//왼쪽으로 가주고
-				while (1) {	//오른쪽으로 되는만큼 이동
-					if (change_target->m_right == NULL) {
-						break;
+				change_target = change_target->m_left;	//move left
+				while (1) {	//move right as far as it can
+					if (change_target->m_right == NULL) {	//if change target has no right child
+						break;	//stop
 					}
 					else {
-						change_target_parent = change_target;
-						change_target = change_target->m_right;
+						change_target_parent = change_target;	//else 
+						change_target = change_target->m_right;	//move right
 					}
 				}
-				if (delete_target->m_left == change_target) {
+				if (delete_target->m_left == change_target) {	//if target's left == change target
+					//if delete target parent's ability > delete_target's ability
 					if (target_parent->m_data.m_ability > delete_target->m_data.m_ability) {
-						target_parent->m_left = change_target;
-						delete delete_target;
+						target_parent->m_left = change_target;	//set change target as parent's left child
+						delete delete_target;	//delete target
 					}
-					else {
-						target_parent->m_right = change_target;
-						delete delete_target;
+					else { //parent's ability < target's ability
+						target_parent->m_right = change_target;	//set change target as parent's right child
+						delete delete_target;	//delete target
 					}
 				}
-				else {
-					if (change_target->m_left != NULL) {
-						change_target_parent->m_right = change_target->m_left;	//바꾸려는 부모먼저
+				else {	//target's left != change target
+					if (change_target->m_left != NULL) {	//if change target's left is not null
+						change_target_parent->m_right = change_target->m_left;	//set change target's left as it's parent's right
 					}
-					change_target->m_left = delete_target->m_left;	//아래에서 위로 끌어올려주고
-					change_target->m_right = delete_target->m_right;	//null 이어도 상관없음
+					change_target->m_left = delete_target->m_left;	//move change target node to delete target node
+					change_target->m_right = delete_target->m_right;
 					target_parent->m_left = change_target;
-					delete delete_target;
+					delete delete_target;	//delete target
 				}
 			}
 		}
 	}
+}
+
+//Recursive Postorder function to de-allocate tree
+void BinarySearchTree::postOrder(TreeNode * t)
+{
+	if (t != NULL) {	//if node is not null
+		postOrder(t->m_left);	//move to left node
+		postOrder(t->m_right);	//move to rigth node
+		cout << t->m_data.m_name << ":" << t->m_data.m_ability << endl;
+		delete t;	//delete node
+	}
+	else return;
 }
 
