@@ -47,7 +47,7 @@ public:
 							return os;	//return os.
 						}
 						else {	//not empty
-							pCur = s.top();	//current not = stack top node
+							pCur = s.top();	//current node = stack top node
 							s.pop();	//stack pop
 						}
 					}

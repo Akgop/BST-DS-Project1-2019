@@ -41,6 +41,7 @@ public:
 
 	SoccerTeam getBestTeam();
 
+	//Compare team sqaud Function
 	int getTeamSquad(SoccerTeam fw, SoccerTeam mf, SoccerTeam df, bool fw_flag, bool mf_flag, bool df_flag);
 };
 

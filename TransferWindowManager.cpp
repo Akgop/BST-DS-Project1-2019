@@ -113,11 +113,7 @@ ostream& operator<<(ostream& os, const TransferWindowManager& manager)
 TransferWindowManager::SoccerTeam TransferWindowManager::getBestTeam()
 {
 	SoccerTeam best_team;	//assign struct
-	
-	//Fill in the code to search the best_team from 4 BSTs
-	//The datas for best team must be stored in the variable best_team.
-	//*best team means the most powerful team that is defined in the project introduction file. 
-	
+		
 	TreeNode *pfwCur, *pmfCur, *pdfCur, *pgkCur;
 	TreeNode *pfwNext, *pmfNext, *pdfNext;
 	//when no more best offer for tree set flag false
