@@ -116,7 +116,7 @@ TransferWindowManager::SoccerTeam TransferWindowManager::getBestTeam()
 		
 	TreeNode *pfwCur, *pmfCur, *pdfCur, *pgkCur;
 	TreeNode *pfwNext, *pmfNext, *pdfNext;
-	//when no more best offer for tree set flag false
+	//when no more best offer for tree, set flag false
 	bool flag_fw = true, flag_mf = true, flag_df = true;
 
 	//initialize with root of each tree

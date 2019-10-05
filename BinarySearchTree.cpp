@@ -69,7 +69,7 @@ void BinarySearchTree::deletion(int ability)
 		return;
 	}
 
-	//Only Right child Node exist
+	//Only Right subtree
 	if (pCur->getLeftNode() == NULL) {
 		if (pParent == NULL)	this->m_root = pCur->getRightNode();		//if pCur == root, right child is new root
 		else if (pParent->getLeftNode() == pCur)	pParent->m_left = pCur->m_right;	//if pCur was left child of parent, set pCur->right as parent->left
@@ -78,7 +78,7 @@ void BinarySearchTree::deletion(int ability)
 		return;
 	}
 
-	//Only Left child Node exist
+	//Only Left subtree
 	if (pCur->getRightNode() == NULL) {
 		if (pParent == NULL)	this->m_root = pCur->getLeftNode();			//if pCur == root, left child is new root
 		else if (pParent->getLeftNode() == pCur)	pParent->m_left = pCur->m_left;		//if pCur was left child of parent, set pCur->left as parent->left
@@ -94,8 +94,8 @@ void BinarySearchTree::deletion(int ability)
 		pTarget = pTarget->getRightNode();
 	}
 	pCur->m_data = pTarget->m_data;	//copy data
-	if (pTargetParent == pCur)	pTargetParent->m_left = pTarget->getLeftNode();
-	else pTargetParent->m_right = pTarget->getLeftNode();
+	if (pTargetParent == pCur)	pTargetParent->m_left = pTarget->getLeftNode();	//if pTarget->right == NULL, pTargetParent->left = pTarget->left
+	else pTargetParent->m_right = pTarget->getLeftNode();	//else pTargetParent->left = pTarget->right
 	delete pTarget;
 
 }
